@@ -5,20 +5,20 @@ import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-public class BEgg1
+public class EntityBEgg1
   extends EntityThrowable
 {
-  public BEgg1(World par1World)
+  public EntityBEgg1(World par1World)
   {
     super(par1World);
   }
   
-  public BEgg1(World par1World, EntityLivingBase par2EntityLivingBase)
+  public EntityBEgg1(World par1World, EntityLivingBase par2EntityLivingBase)
   {
     super(par1World, par2EntityLivingBase);
   }
   
-  public BEgg1(World par1World, double par2, double par4, double par6)
+  public EntityBEgg1(World par1World, double par2, double par4, double par6)
   {
     super(par1World, par2, par4, par6);
   }
