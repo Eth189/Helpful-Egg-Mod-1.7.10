@@ -1,9 +1,8 @@
 package com.ethan.entities;
 
 import com.ethan.LuckyEggMain;
-import java.util.Random;
+
 import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -12,11 +11,9 @@ import net.minecraft.entity.ai.EntityAILookIdle;
 import net.minecraft.entity.ai.EntityAIMate;
 import net.minecraft.entity.ai.EntityAIPanic;
 import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.ai.EntityAITempt;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -27,166 +24,237 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-public class EntityHelpfulChicken
-  extends EntityAnimal
+public class EntityHelpfulChicken extends EntityAnimal
 {
-  
- 
-    public float bp;
-    public float bq;
-    public float br;
-    public float bs;
-    public float bt = 1.0F;
-    public int bu;
-    public boolean bv;
+    public float field_70886_e;
+    public float destPos;
+    public float field_70884_g;
+    public float field_70888_h;
+    public float field_70889_i = 1.0F;
+    /** The time until the next egg is spawned. */
+    public int timeUntilNextEgg;
+    public boolean field_152118_bv;
+    private static final String __OBFID = "CL_00001639";
 
-    public EntityHelpfulChicken(World world) {
-        super(world);
-        this.a(0.3F, 0.7F);
-        this.bu = this.random.nextInt(6000) + 6000;
-        this.goalSelector.a(0, new PathfinderGoalFloat(this));
-        this.goalSelector.a(1, new PathfinderGoalPanic(this, 1.4D));
-        this.goalSelector.a(2, new PathfinderGoalBreed(this, 1.0D));
-        this.goalSelector.a(3, new PathfinderGoalTempt(this, 1.0D, Items.SEEDS, false));
-        this.goalSelector.a(4, new PathfinderGoalFollowParent(this, 1.1D));
-        this.goalSelector.a(5, new PathfinderGoalRandomStroll(this, 1.0D));
-        this.goalSelector.a(6, new PathfinderGoalLookAtPlayer(this, EntityHuman.class, 6.0F));
-        this.goalSelector.a(7, new PathfinderGoalRandomLookaround(this));
+    public EntityHelpfulChicken(World p_i1682_1_)
+    {
+        super(p_i1682_1_);
+        this.setSize(0.3F, 0.7F);
+        this.timeUntilNextEgg = this.rand.nextInt(6000) + 6000;
+        this.tasks.addTask(0, new EntityAISwimming(this));
+        this.tasks.addTask(1, new EntityAIPanic(this, 1.4D));
+        this.tasks.addTask(2, new EntityAIMate(this, 1.0D));
+        this.tasks.addTask(3, new EntityAITempt(this, 1.0D, Items.wheat_seeds, false));
+        this.tasks.addTask(4, new EntityAIFollowParent(this, 1.1D));
+        this.tasks.addTask(5, new EntityAIWander(this, 1.0D));
+        this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 6.0F));
+        this.tasks.addTask(7, new EntityAILookIdle(this));
     }
 
-    public boolean bk() {
+    /**
+     * Returns true if the newer Entity AI code should be run
+     */
+    public boolean isAIEnabled()
+    {
         return true;
     }
 
-    protected void aD() {
-        super.aD();
-        this.getAttributeInstance(GenericAttributes.maxHealth).setValue(4.0D);
-        this.getAttributeInstance(GenericAttributes.d).setValue(0.25D);
+    protected void applyEntityAttributes()
+    {
+        super.applyEntityAttributes();
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(4.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.25D);
     }
 
-    public void e() {
-        super.e();
-        this.bs = this.bp;
-        this.br = this.bq;
-        this.bq = (float) ((double) this.bq + (double) (this.onGround ? -1 : 4) * 0.3D);
-        if (this.bq < 0.0F) {
-            this.bq = 0.0F;
+    /**
+     * Called frequently so the entity can update its state every tick as required. For example, zombies and skeletons
+     * use this to react to sunlight and start to burn.
+     */
+    public void onLivingUpdate()
+    {
+        super.onLivingUpdate();
+        this.field_70888_h = this.field_70886_e;
+        this.field_70884_g = this.destPos;
+        this.destPos = (float)((double)this.destPos + (double)(this.onGround ? -1 : 4) * 0.3D);
+
+        if (this.destPos < 0.0F)
+        {
+            this.destPos = 0.0F;
         }
 
-        if (this.bq > 1.0F) {
-            this.bq = 1.0F;
+        if (this.destPos > 1.0F)
+        {
+            this.destPos = 1.0F;
         }
 
-        if (!this.onGround && this.bt < 1.0F) {
-            this.bt = 1.0F;
+        if (!this.onGround && this.field_70889_i < 1.0F)
+        {
+            this.field_70889_i = 1.0F;
         }
 
-        this.bt = (float) ((double) this.bt * 0.9D);
-        if (!this.onGround && this.motY < 0.0D) {
-            this.motY *= 0.6D;
+        this.field_70889_i = (float)((double)this.field_70889_i * 0.9D);
+
+        if (!this.onGround && this.motionY < 0.0D)
+        {
+            this.motionY *= 0.6D;
         }
 
-        this.bp += this.bt * 2.0F;
-        if (!this.world.isStatic && !this.isBaby() && !this.isChickenJockey() && --this.bu <= 0) {
-            this.makeSound("mob.chicken.plop", 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
-            this.a(Items.EGG, 1);
-            this.bu = this.random.nextInt(6000) + 6000;
+        this.field_70886_e += this.field_70889_i * 2.0F;
+
+        if (!this.worldObj.isRemote && !this.isChild() && !this.func_152116_bZ() && --this.timeUntilNextEgg <= 0)
+        {
+            this.playSound("mob.chicken.plop", 1.0F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
+          
+            this.dropItem(LuckyEggMain.TPEgg, 1);
+            this.timeUntilNextEgg = this.rand.nextInt(6000) + 6000;
         }
     }
 
-    protected void b(float f) {}
+    /**
+     * Called when the mob is falling. Calculates and applies fall damage.
+     */
+    protected void fall(float p_70069_1_) {}
 
-    protected String t() {
+    /**
+     * Returns the sound this mob makes while it's alive.
+     */
+    protected String getLivingSound()
+    {
         return "mob.chicken.say";
     }
 
-    protected String aT() {
+    /**
+     * Returns the sound this mob makes when it is hurt.
+     */
+    protected String getHurtSound()
+    {
         return "mob.chicken.hurt";
     }
 
-    protected String aU() {
+    /**
+     * Returns the sound this mob makes on death.
+     */
+    protected String getDeathSound()
+    {
         return "mob.chicken.hurt";
     }
 
-    protected void a(int i, int j, int k, Block block) {
-        this.makeSound("mob.chicken.step", 0.15F, 1.0F);
+    protected void func_145780_a(int p_145780_1_, int p_145780_2_, int p_145780_3_, Block p_145780_4_)
+    {
+        this.playSound("mob.chicken.step", 0.15F, 1.0F);
     }
 
-    protected Item getLoot() {
-        return LuckyEggMain.ItemLuckyEgg;
+    protected Item getDropItem()
+    {
+        return LuckyEggMain.LuckyEgg;
     }
+    protected void dropRareDrop(int rare)
+    {
+        switch (this.rand.nextInt(3))
+        {
+            case 0:
+                this.dropItem(LuckyEggMain.BEgg1, 1);
+                break;
+            case 1:
+                this.dropItem(LuckyEggMain.BEgg5, 1);
+                break;
+            case 2:
+                this.dropItem(LuckyEggMain.BEgg10, 1);
+        }
+    }
+    /**
+     * Drop 0-2 items of this living's type. @param par1 - Whether this entity has recently been hit by a player. @param
+     * par2 - Level of Looting used to kill this mob.
+     */
+    protected void dropFewItems(boolean p_70628_1_, int p_70628_2_)
+    {
+        int j = this.rand.nextInt(3) + this.rand.nextInt(1 + p_70628_2_);
 
-    protected void dropDeathLoot(boolean flag, int i) {
-        int j = this.random.nextInt(3) + this.random.nextInt(1 + i);
-
-        for (int k = 0; k < j; ++k) {
-            this.a(Items.FEATHER, 1);
+        for (int k = 0; k < j; ++k)
+        {
+            this.dropItem(LuckyEggMain.LuckyEgg,1 );
         }
 
-        if (this.isBurning()) {
-            this.a(Items.COOKED_CHICKEN, 1);
-        } else {
-            this.a(Items.RAW_CHICKEN, 1);
+        if (this.isBurning())
+        {
+            this.dropItem(Items.cooked_chicken, 1);
+        }
+        else
+        {
+            this.dropItem(LuckyEggMain.LuckyEgg, 1);
         }
     }
 
-    public EntityHelpfulChicken b(EntityAgeable entityageable) {
-        return new EntityHelpfulChicken(this.world);
+    public EntityHelpfulChicken createChild(EntityAgeable p_90011_1_)
+    {
+        return new EntityHelpfulChicken(this.worldObj);
     }
 
-    public boolean c(ItemStack itemstack) {
-        return itemstack != null && itemstack.getItem() instanceof ItemSeeds;
+    /**
+     * Checks if the parameter is an item which this animal can be fed to breed it (wheat, carrots or seeds depending on
+     * the animal type)
+     */
+    public boolean isBreedingItem(ItemStack p_70877_1_)
+    {
+        return p_70877_1_ != null && p_70877_1_.getItem() instanceof ItemSeeds;
     }
 
-    public void a(NBTTagCompound nbttagcompound) {
-        super.a(nbttagcompound);
-        this.bv = nbttagcompound.getBoolean("IsChickenJockey");
+    /**
+     * (abstract) Protected helper method to read subclass entity data from NBT.
+     */
+    public void readEntityFromNBT(NBTTagCompound p_70037_1_)
+    {
+        super.readEntityFromNBT(p_70037_1_);
+        this.field_152118_bv = p_70037_1_.getBoolean("IsChickenJockey");
     }
 
-    protected int getExpValue(EntityHuman entityhuman) {
-        return this.isChickenJockey() ? 10 : super.getExpValue(entityhuman);
+    /**
+     * Get the experience points the entity currently has.
+     */
+    protected int getExperiencePoints(EntityPlayer p_70693_1_)
+    {
+        return this.func_152116_bZ() ? 10 : super.getExperiencePoints(p_70693_1_);
     }
 
-    public void b(NBTTagCompound nbttagcompound) {
-        super.b(nbttagcompound);
-        nbttagcompound.setBoolean("IsChickenJockey", this.bv);
+    /**
+     * (abstract) Protected helper method to write subclass entity data to NBT.
+     */
+    public void writeEntityToNBT(NBTTagCompound p_70014_1_)
+    {
+        super.writeEntityToNBT(p_70014_1_);
+        p_70014_1_.setBoolean("IsChickenJockey", this.field_152118_bv);
     }
 
-    protected boolean isTypeNotPersistent() {
-        return this.isChickenJockey() && this.passenger == null;
+    /**
+     * Determines if an entity can be despawned, used on idle far away entities
+     */
+    protected boolean canDespawn()
+    {
+        return true;
     }
 
-    public void ac() {
-        super.ac();
-        float f = MathHelper.sin(this.aM * 3.1415927F / 180.0F);
-        float f1 = MathHelper.cos(this.aM * 3.1415927F / 180.0F);
+    public void updateRiderPosition()
+    {
+        super.updateRiderPosition();
+        float f = MathHelper.sin(this.renderYawOffset * (float)Math.PI / 180.0F);
+        float f1 = MathHelper.cos(this.renderYawOffset * (float)Math.PI / 180.0F);
         float f2 = 0.1F;
         float f3 = 0.0F;
+        this.riddenByEntity.setPosition(this.posX + (double)(f2 * f), this.posY + (double)(this.height * 0.5F) + this.riddenByEntity.getYOffset() + (double)f3, this.posZ - (double)(f2 * f1));
 
-        this.passenger.setPosition(this.locX + (double) (f2 * f), this.locY + (double) (this.length * 0.5F) + this.passenger.ad() + (double) f3, this.locZ - (double) (f2 * f1));
-        if (this.passenger instanceof EntityLiving) {
-            ((EntityLiving) this.passenger).aM = this.aM;
+        if (this.riddenByEntity instanceof EntityLivingBase)
+        {
+            ((EntityLivingBase)this.riddenByEntity).renderYawOffset = this.renderYawOffset;
         }
     }
 
-    public boolean isChickenJockey() {
-        return this.bv;
+    public boolean func_152116_bZ()
+    {
+        return this.field_152118_bv;
     }
 
-    public void i(boolean flag) {
-        this.bv = flag;
+    public void func_152117_i(boolean p_152117_1_)
+    {
+        this.field_152118_bv = p_152117_1_;
     }
-
-    public EntityAgeable createChild(EntityAgeable entityageable) {
-        return this.b(entityageable);
-    }
-}
-  {
-    return this.field_152118_bv;
-  }
-  
-  public void func_152117_i(boolean p_152117_1_)
-  {
-    this.field_152118_bv = p_152117_1_;
-  }
 }
