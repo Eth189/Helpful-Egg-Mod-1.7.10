@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 public class ItemBEgg50
   extends Item
 {
-  public ItemBEgg1(String name)
+  public ItemBEgg50(String name)
   {
    setCreativeTab(LuckyEggMain.tabEgg);
     setUnlocalizedName("ethan_luckyegg_" + name);
