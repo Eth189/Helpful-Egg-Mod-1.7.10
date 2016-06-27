@@ -8,10 +8,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-public class LuckyEgg
+public class ItemLuckyEgg
   extends Item
 {
-  public LuckyEgg(String name)
+  public ItemLuckyEgg(String name)
   {
    setCreativeTab(LuckyEggMain.tabEgg);
     setUnlocalizedName("ethan_luckyegg_" + name);
