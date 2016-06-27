@@ -178,7 +178,7 @@ protected void onImpact(MovingObjectPosition position)
 
 
 
-      func_70106_y();
+    this.setDead();
     }
   }
   protected float getGravityVelocity()
