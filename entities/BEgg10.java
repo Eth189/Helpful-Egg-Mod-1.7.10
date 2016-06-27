@@ -35,7 +35,7 @@ public class BEgg10
     }
   }
   
-  protected float func_70185_h()
+  protected float getGravityVelocity()
   {
     return 0.03F;
   }
