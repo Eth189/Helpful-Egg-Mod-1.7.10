@@ -3,6 +3,7 @@ package com.ethan.entities;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
@@ -27,16 +28,17 @@ public class EntityMiningEgg
   protected void onImpact(MovingObjectPosition position)
   {
     int r = 0;
-    int i = position.field_72311_b;
-    int j = position.field_72312_c;
-    int k = position.field_72309_d;
+	  int i = position.blockX;
+    int j = position.blockY;
+    int k = position.blockZ;
     int l = 1;
     int li = 0;
-    if (!this.worldObj.isRemote)
-    {
-      Block blck = this.world.getBlock(i, j, k);
-   blck.dropBlockAsItem(worldObj, i, j, k, l , li);
+    if (!this.worldObj.isRemote) {
+    	Block blck = worldObj.getBlock(i, j, k);
+    	blck.dropBlockAsItem(worldObj, i, j, k, l , li);
       this.worldObj.setBlockToAir(i, j, k);
+     
+    
     }
   }
   
