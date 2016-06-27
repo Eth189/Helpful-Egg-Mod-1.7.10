@@ -181,4 +181,19 @@ protected void onImpact(MovingObjectPosition position)
       func_70106_y();
     }
   }
+  protected float getGravityVelocity()
+  {
+    return 0.01F;
+  }
   
+  protected float func_70182_d()
+  {
+    return 0.7F;
+  }
+  
+  protected float func_70183_g()
+  {
+    return -20.0F;
+  }
+}
+
